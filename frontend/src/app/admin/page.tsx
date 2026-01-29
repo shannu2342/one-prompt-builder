@@ -44,25 +44,64 @@ export default function AdminDashboard() {
   useEffect(() => {
     const token = localStorage.getItem('adminToken')
     const user = localStorage.getItem('adminUser')
-    
+
     if (!token) {
       router.push('/admin/login')
       return
     }
-    
+
     if (user) {
       setAdminUser(JSON.parse(user))
     }
-    
+
     fetchAnalytics(token)
   }, [])
 
   const fetchAnalytics = async (token: string) => {
     try {
-      const response = await axios.get('http://localhost:5000/api/admin/analytics', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      setAnalytics(response.data)
+      // Mock analytics data for testing without backend
+      if (token && token.includes('admin-mock-token')) {
+        const mockAnalytics: Analytics = {
+          totalUsers: 150,
+          totalProjects: 280,
+          totalGenerations: 520,
+          recentActivity: [
+            {
+              projectId: '1',
+              projectName: 'E-commerce Store',
+              userName: 'John Doe',
+              type: 'website',
+              createdAt: new Date(Date.now() - 3600000).toISOString()
+            },
+            {
+              projectId: '2',
+              projectName: 'Task Manager',
+              userName: 'Jane Smith',
+              type: 'mobile-app',
+              createdAt: new Date(Date.now() - 7200000).toISOString()
+            },
+            {
+              projectId: '3',
+              projectName: 'Weather App',
+              userName: 'Mike Johnson',
+              type: 'both',
+              createdAt: new Date(Date.now() - 10800000).toISOString()
+            }
+          ],
+          stats: {
+            websiteProjects: 150,
+            mobileProjects: 100,
+            dualProjects: 30
+          }
+        }
+        setAnalytics(mockAnalytics)
+      } else {
+        // Try real API call
+        const response = await axios.get('http://localhost:5000/api/admin/analytics', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        setAnalytics(response.data)
+      }
     } catch (error: any) {
       if (error.response?.status === 401) {
         toast.error('Session expired. Please login again.')
