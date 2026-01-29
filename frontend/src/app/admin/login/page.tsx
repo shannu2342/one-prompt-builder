@@ -13,7 +13,7 @@ export default function AdminLoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!credentials.username || !credentials.password) {
       toast.error('Please enter username and password')
       return
@@ -22,11 +22,27 @@ export default function AdminLoginPage() {
     setLoading(true)
 
     try {
-      const response = await axios.post('http://localhost:5000/api/admin/login', credentials)
-      localStorage.setItem('adminToken', response.data.token)
-      localStorage.setItem('adminUser', JSON.stringify(response.data.admin))
-      toast.success('Admin login successful')
-      router.push('/admin')
+      // Mock admin login for testing without backend
+      if (credentials.username === 'admin' && credentials.password === 'admin123') {
+        const mockAdmin = {
+          id: '1',
+          username: 'admin',
+          email: 'admin@builder.com'
+        }
+        const mockToken = 'admin-mock-token-' + Date.now()
+
+        localStorage.setItem('adminToken', mockToken)
+        localStorage.setItem('adminUser', JSON.stringify(mockAdmin))
+        toast.success('Admin login successful')
+        router.push('/admin')
+      } else {
+        // Try real API login if mock fails
+        const response = await axios.post('http://localhost:5000/api/admin/login', credentials)
+        localStorage.setItem('adminToken', response.data.token)
+        localStorage.setItem('adminUser', JSON.stringify(response.data.admin))
+        toast.success('Admin login successful')
+        router.push('/admin')
+      }
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Login failed')
     } finally {
@@ -42,10 +58,10 @@ export default function AdminLoginPage() {
             <Shield className="h-8 w-8 text-white" />
           </div>
         </div>
-        
+
         <h1 className="text-3xl font-bold text-white mb-2 text-center">Admin Login</h1>
         <p className="text-gray-400 text-center mb-8">Access the admin dashboard</p>
-        
+
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -60,7 +76,7 @@ export default function AdminLoginPage() {
               disabled={loading}
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Password
@@ -74,7 +90,7 @@ export default function AdminLoginPage() {
               disabled={loading}
             />
           </div>
-          
+
           <button
             type="submit"
             disabled={loading}
@@ -90,7 +106,7 @@ export default function AdminLoginPage() {
             )}
           </button>
         </form>
-        
+
         <div className="mt-6 p-4 bg-gray-700 rounded-lg">
           <p className="text-xs text-gray-400 text-center">
             Default credentials: <span className="text-blue-400 font-mono">admin / admin123</span>

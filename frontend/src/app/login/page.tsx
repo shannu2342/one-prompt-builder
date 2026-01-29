@@ -22,11 +22,28 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const response = await authApi.login(formData.email, formData.password)
-      setUser(response.user)
-      setToken(response.token)
-      toast.success('Login successful!')
-      router.push('/dashboard')
+      // Mock login for testing without backend
+      if (formData.email === 'user@example.com' && formData.password === 'password123') {
+        const mockUser = {
+          id: '1',
+          name: 'Test User',
+          email: 'user@example.com',
+          role: 'user' as const
+        }
+        const mockToken = 'mock-token-' + Date.now()
+
+        setUser(mockUser)
+        setToken(mockToken)
+        toast.success('Login successful!')
+        router.push('/dashboard')
+      } else {
+        // Try real API login if mock fails
+        const response = await authApi.login(formData.email, formData.password)
+        setUser(response.user)
+        setToken(response.token)
+        toast.success('Login successful!')
+        router.push('/dashboard')
+      }
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Login failed')
     } finally {
