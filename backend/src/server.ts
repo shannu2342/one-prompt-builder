@@ -35,7 +35,32 @@ async function createDefaultAdmin() {
   }
 }
 
-createDefaultAdmin();
+// Create default user account
+async function createDefaultUser() {
+  try {
+    const existingUser = storage.findUserByEmail('user@example.com');
+    if (!existingUser) {
+      const hashedPassword = await bcrypt.hash('password123', 10);
+      storage.createUser({
+        name: 'Test User',
+        email: 'user@example.com',
+        password: hashedPassword,
+        role: 'user',
+      });
+      console.log('✅ Default user created: email=user@example.com, password=password123');
+    }
+  } catch (error) {
+    console.error('Error creating default user:', error);
+  }
+}
+
+// Create both default admin and user
+async function createDefaultAccounts() {
+  await createDefaultAdmin();
+  await createDefaultUser();
+}
+
+createDefaultAccounts();
 
 // Initialize express app
 const app = express();
